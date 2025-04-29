@@ -3,6 +3,7 @@
 #include <Wire.h>
 #include <MPU6050.h>
 
+MPU6050 imu;
 // --- Déclarations moteur
 #define MFR_1 2
 #define MFR_2 4
@@ -13,6 +14,8 @@
 #define MBL_1 22
 #define MBL_2 23
 
+#define PWM_VALUE 150
+#define DURATION 3000 // en ms
 
 
 
@@ -38,6 +41,12 @@ void move_back_or_forward(int speed){
   setMotor(speed,MBR_1,MBR_2);
 
 }
+void stopAllMotors(){
+  setMotor(0,MFL_1,MFL_2);
+  setMotor(0,MFR_1,MFR_2);
+  setMotor(0,MBL_1,MBL_2);
+  setMotor(0,MBR_1,MBR_2);
+}
 
 
 // --- Ps3 Events
@@ -53,6 +62,11 @@ void notify() {
 void onConnect() {
   Serial.println("Connected!.");
 }
+
+void calibrateMotors() {
+  
+}
+
 
 // --- Setup
 void setup() {
@@ -71,7 +85,12 @@ void setup() {
   pinMode(MBR_2, OUTPUT);
   pinMode(MBL_1, OUTPUT);
   pinMode(MBL_2, OUTPUT);
-
+  Wire.begin();
+  imu.initialize();
+  if (!imu.testConnection()) {
+    Serial.println("IMU non connectée !");
+    while (1);
+  }
   Serial.println("Ready.");
 }
 
